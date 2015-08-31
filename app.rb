@@ -7,14 +7,28 @@ Bundler.require :default, RACK_ENV
 $LOAD_PATH << File.dirname(__FILE__)
 
 Dotenv.load
+require 'logger'
+require 'tilt/erb'
+require './metrics_tracker'
 
 class App < Sinatra::Base
   enable :static
   enable :logging
+  set :logger, ::Logger.new(STDOUT)
+  set :tracker, MetricsTracker.new(logger)
+
+  configure do
+    tracker.run
+  end
 
   get '/' do
+    logger.info 'HEEHEHEEHERE'
     @phrase = generate_phrase
     erb :index
+  end
+
+  get '/pulse' do
+    json({foo: 'bar'})
   end
 
   protected
