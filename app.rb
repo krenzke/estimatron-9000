@@ -34,7 +34,7 @@ class App < Sinatra::Base
     when 4
       "Give it a #{numbers.sample}, but don't assign the ticket to me"
     when 5
-      "Call is a #{numbers.sample}, but assign a #{numbers.sample} to the rest of them"
+      "Call it a #{numbers.sample}, but assign a #{numbers.sample} to the rest of them"
     end
   end
 end
