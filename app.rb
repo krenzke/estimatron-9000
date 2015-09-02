@@ -32,7 +32,7 @@ class App < Sinatra::Base
   end
 
   get '/pulse' do
-    json settings.tracker.sample
+    json(settings.tracker.sample.merge({dyno: ENV['DYNO']}))
   end
 
   protected
