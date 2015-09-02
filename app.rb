@@ -17,18 +17,22 @@ class App < Sinatra::Base
   set :logger, ::Logger.new(STDOUT)
   set :tracker, MetricsTracker.new(logger)
 
-  configure do
-    tracker.run
+  configure :production do
+    settings.tracker.run
+  end
+
+  configure :development do
+    register Sinatra::Reloader
+    also_reload './metrics_tracker'
   end
 
   get '/' do
-    logger.info 'HEEHEHEEHERE'
     @phrase = generate_phrase
     erb :index
   end
 
   get '/pulse' do
-    json({foo: 'bar'})
+    json settings.tracker.sample
   end
 
   protected
