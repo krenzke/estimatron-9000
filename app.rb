@@ -15,7 +15,7 @@ class App < Sinatra::Base
   enable :static
   enable :logging
   set :logger, ::Logger.new(STDOUT)
-  set :tracker, MetricsTracker.new(logger)
+  set :tracker, MetricsTracker.new
 
   configure :production do
     settings.tracker.run
