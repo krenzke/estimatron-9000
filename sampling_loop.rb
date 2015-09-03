@@ -14,11 +14,11 @@ class SamplingLoop
   end
 
   def run
-    logger.info("SAMPLING_LOOP#run")
+    @logger.info("SAMPLING_LOOP#run")
     @exchange ||= mq_create_exchange('services_status', :fanout)
     Thread.new {
       1000.times {
-        logger.info("SAMPLING_LOOP#sample")
+        @logger.info("SAMPLING_LOOP#sample")
         s = @sampler.sample.merge(@service_info)
         @exchange.publish(s.to_json, content_type: 'application/json')
         sleep 5
