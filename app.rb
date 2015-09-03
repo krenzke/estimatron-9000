@@ -22,7 +22,7 @@ class App < Sinatra::Base
   end
 
   configure :development do
-    # SamplingLoop.new.run
+    SamplingLoop.new.run
   end
 
   get '/' do

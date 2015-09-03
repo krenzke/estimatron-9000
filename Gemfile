@@ -12,4 +12,5 @@ gem 'activesupport', require: false
 group :development do
   gem 'heroku'
   gem 'pry'
+  gem 'byebug'
 end

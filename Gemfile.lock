@@ -12,6 +12,7 @@ GEM
     backports (3.6.6)
     bunny (2.1.0)
       amq-protocol (>= 2.0.0)
+    byebug (6.0.2)
     coderay (1.1.0)
     domain_name (0.5.24)
       unf (>= 0.0.5, < 1.0.0)
@@ -83,6 +84,7 @@ PLATFORMS
 DEPENDENCIES
   activesupport
   bunny
+  byebug
   dotenv
   heroku
   pry

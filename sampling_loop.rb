@@ -7,7 +7,7 @@ require 'logger'
 class SamplingLoop
   include RabbitMqProducer
 
-  def intialize
+  def initialize
     @sampler = MetricsSampler.new
     @service_info = ServiceDiscovery.info
     @logger = Logger.new(STDOUT)
