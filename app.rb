@@ -1,4 +1,3 @@
-# bro
 RACK_ENV = ENV['RACK_ENV'] || 'development'
 
 require 'rubygems'
@@ -9,21 +8,21 @@ $LOAD_PATH << File.dirname(__FILE__)
 Dotenv.load
 require 'logger'
 require 'tilt/erb'
-require './metrics_tracker'
+require './metrics_sampler'
+require './sampling_loop'
+require './service_discovery'
 
 class App < Sinatra::Base
   enable :static
   enable :logging
   set :logger, ::Logger.new(STDOUT)
-  set :tracker, MetricsTracker.new
 
   configure :production do
-    settings.tracker.run
+    SamplingLoop.new.run
   end
 
   configure :development do
-    register Sinatra::Reloader
-    also_reload './metrics_tracker'
+    # SamplingLoop.new.run
   end
 
   get '/' do
@@ -32,7 +31,9 @@ class App < Sinatra::Base
   end
 
   get '/pulse' do
-    json(settings.tracker.sample.merge({dyno: ENV['DYNO']}))
+    sample = MetricsSampler.new.sample
+    sample.merge!(ServiceDiscovery.info)
+    json(sample)
   end
 
   protected

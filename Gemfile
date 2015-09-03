@@ -7,6 +7,7 @@ gem 'sinatra-contrib'
 gem 'dotenv'
 gem 'puma'
 gem 'bunny'
+gem 'activesupport', require: false
 
 group :development do
   gem 'heroku'

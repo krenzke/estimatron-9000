@@ -1,19 +1,9 @@
 require 'bunny'
 require 'json'
 
-class MetricsTracker
+class MetricsSampler
   def initialize
     # @last_cpu_time = nil
-  end
-
-  def run
-    Thread.new {
-      100.times {
-        publish_sample
-        sleep 5
-      }
-      rabbit_conn.stop
-    }
   end
 
   def sample
@@ -66,23 +56,4 @@ class MetricsTracker
     ObjectSpace.count_objects[:TOTAL] rescue nil
   end
 
-  def publish_sample
-    rabbit_exchange.publish(sample.to_json, content_type: 'application/json')
-  end
-
-  def rabbit_exchange
-    @rabbit_exchange ||= rabbit_channel.fanout('services_status')
-  end
-
-  def rabbit_channel
-    @rabbit_channel ||= rabbit_conn.create_channel
-  end
-
-  def rabbit_conn
-    return @rabbit_conn if @rabbit_conn
-    @rabbit_conn = Bunny.new(host: ENV['RABBITMQ_HOST'],
-                             user: ENV['RABBITMQ_USER'],
-                             pass: ENV['RABBITMQ_PASS'])
-    @rabbit_conn.start
-  end
 end
