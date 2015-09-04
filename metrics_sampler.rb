@@ -11,6 +11,7 @@ class MetricsSampler
       memory: sample_memory,
       cpu: sample_cpu,
       object_count: sample_object_count,
+      recorded_at: Time.now,
     }
   end
 
