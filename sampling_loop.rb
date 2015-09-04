@@ -17,13 +17,15 @@ class SamplingLoop
     @logger.info("SAMPLING_LOOP#run")
     @exchange ||= mq_create_exchange('services_status', :fanout)
     Thread.new {
-      loop {
+      begin
+        loop {
           @logger.info("SAMPLING_LOOP#sample")
           s = @sampler.sample.merge(@service_info)
           @exchange.publish(s.to_json, content_type: 'application/json')
         }
-      }
-      mq_close
+      ensure
+        mq_close
+      end
     }
   end
 end
