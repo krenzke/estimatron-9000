@@ -22,6 +22,7 @@ class SamplingLoop
           @logger.info("SAMPLING_LOOP#sample")
           s = @sampler.sample.merge(@service_info)
           @exchange.publish(s.to_json, content_type: 'application/json')
+          sleep 5
         }
       ensure
         mq_close
