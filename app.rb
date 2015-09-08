@@ -33,7 +33,7 @@ class App < Sinatra::Base
 
   get '/pulse' do
     sample = settings.sampler.sample
-    sample.merge!(ServiceDiscovery.info).merge!(env: ENV.to_h)
+    sample.merge!(ServiceDiscovery.info)
     json(sample)
   end
 
