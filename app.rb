@@ -16,13 +16,14 @@ class App < Sinatra::Base
   enable :static
   enable :logging
   set :logger, ::Logger.new(STDOUT)
+  set :sampler, MetricsSampler.new
 
   configure :production do
     SamplingLoop.new.run
   end
 
   configure :development do
-    SamplingLoop.new.run
+    # SamplingLoop.new.run
   end
 
   get '/' do
@@ -31,7 +32,7 @@ class App < Sinatra::Base
   end
 
   get '/pulse' do
-    sample = MetricsSampler.new.sample
+    sample = settings.sampler.sample
     sample.merge!(ServiceDiscovery.info)
     json(sample)
   end

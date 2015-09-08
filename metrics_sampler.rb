@@ -1,17 +1,23 @@
 require 'bunny'
 require 'json'
+require 'system_info'
 
 class MetricsSampler
   def initialize
-    # @last_cpu_time = nil
+    @last_cpu_time = nil
+    @num_logical_processors = SystemInfo.num_logical_processors
+    @total_memory = SystemInfo.ram_in_mib
   end
 
   def sample
+    cpu = sample_cpu
     {
       memory: sample_memory,
-      cpu: sample_cpu,
+      cpu_user: cpu[:user_time],
+      cpu_system: cpu[:system_time],
       object_count: sample_object_count,
       recorded_at: Time.now,
+      total_memory: @total_memory,
     }
   end
 
@@ -28,33 +34,31 @@ class MetricsSampler
   end
 
   def sample_cpu
-    # now = Time.now
-    # t = Process.times
-    # s = nil
-    # if @last_cpu_time
-    #   elapsed = now - @last_cpu_time
-    #   return if elapsed < 1 # Causing some kind of math underflow
+    now = Time.now
+    t = Process.times
+    s = {
+      user_time: nil,
+      system_time: nil,
+    }
+    if @last_cpu_time
+      elapsed = now - @last_cpu_time
+      return if elapsed < 1 # Causing some kind of math underflow
 
-    #   usertime = t.utime - @last_utime
-    #   systemtime = t.stime - @last_stime
+      usertime = t.utime - @last_utime
+      systemtime = t.stime - @last_stime
 
-    #   # record_systemtime(systemtime) if systemtime >= 0
-    #   # record_usertime(usertime) if usertime >= 0
-
-    #   # Calculate the true utilization by taking cpu times and dividing by
-    #   # elapsed time X processor_count.
-
-    #   # record_user_util(usertime / (elapsed * @processor_count))
-    #   s = (systemtime / elapsed)
-    # end
-    # @last_utime = t.utime
-    # @last_stime = t.stime
-    # @last_cpu_time = now
-    # s
+      s = {
+        user_time: usertime / ( elapsed * @num_logical_processors ),
+        system_time: systemtime / ( elapsed * @num_logical_processors ),
+      }
+    end
+    @last_utime = t.utime
+    @last_stime = t.stime
+    @last_cpu_time = now
+    s
   end
 
   def sample_object_count
     ObjectSpace.count_objects[:TOTAL] rescue nil
   end
-
 end
