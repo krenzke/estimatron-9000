@@ -10,16 +10,17 @@ require 'logger'
 require 'tilt/erb'
 require './metrics_sampler'
 require './sampling_loop'
-require './service_discovery'
+require './service_introspection'
 
 class App < Sinatra::Base
   enable :static
   enable :logging
   set :logger, ::Logger.new(STDOUT)
   set :sampler, MetricsSampler.new
+  set :introspector, ServiceIntrospection.platform_specific_introspector
 
   configure :production do
-    SamplingLoop.new.run
+    # SamplingLoop.new.run
   end
 
   configure :development do
@@ -32,9 +33,18 @@ class App < Sinatra::Base
   end
 
   get '/pulse' do
-    sample = settings.sampler.sample
-    sample.merge!(ServiceDiscovery.info)
-    json(sample)
+    # sample = settings.sampler.sample
+    # json(sample)
+    if settings.introspector
+      json({
+        foo: 'bar'
+      })
+    else
+      json({
+        hosting_platform: ServiceIntrospection.hosting_platform,
+        error: 'no introspector',
+      })
+    end
   end
 
   protected

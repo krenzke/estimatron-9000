@@ -8,6 +8,7 @@ gem 'dotenv'
 gem 'puma'
 gem 'bunny'
 gem 'activesupport', require: false
+gem 'faraday', require: false
 
 group :development do
   gem 'heroku'
