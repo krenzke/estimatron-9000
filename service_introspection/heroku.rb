@@ -1,5 +1,7 @@
 require 'faraday'
 require 'json'
+require 'logger'
+$logger = ::Logger.new(STDOUT)
 
 class ServiceIntrospection
   class Heroku
@@ -9,13 +11,23 @@ class ServiceIntrospection
       ENV['DYNO'] || ENV['HEROKU_API_KEY']
     end
 
+    def initialize
+      $logger.info("Created ServiceIntrospection::Heroku")
+      $logger.info("ENV['HEROKU_API_KEY']: #{ENV['HEROKU_API_KEY']}")
+      $logger.info("ENV['HEROKU_APP_ID']: #{ENV['HEROKU_APP_ID']}")
+    end
+
     def deployment_history
       return @deployment_history if @deployment_history
+      $logger.info("Fetching deployments")
 
       # get list of most recent releases
       releases = make_heroku_request("/app/#{ENV['HEROKU_APP_ID']}/releases", {}, {
         'Range' => 'version; order=desc;'
       })
+
+      $logger.info("releases: #{releases.size}")
+      $logger.info("releases: #{releases}")
 
       # we're only interested in deployments, so select those
       @deployment_history = releases.select{ |e| e['description'] =~ /^Deploy/ }.map do |r|
@@ -26,6 +38,8 @@ class ServiceIntrospection
           slug_id: r['slug']['id'],
         }
       end
+
+      $logger.info("deployments: #{@deployment_history.size}")
 
       # need to look at the slug to get the full git sha and commit message
       @deployment_history.each do |deploy|
