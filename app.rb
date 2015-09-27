@@ -37,7 +37,8 @@ class App < Sinatra::Base
     # json(sample)
     if settings.introspector
       json({
-        foo: 'bar'
+        foo: 'bar',
+        hosting_platform: ServiceIntrospection.hosting_platform,
       })
     else
       json({
