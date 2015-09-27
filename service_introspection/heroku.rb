@@ -22,7 +22,7 @@ class ServiceIntrospection
       $logger.info("Fetching deployments")
 
       # get list of most recent releases
-      releases = make_heroku_request("/app/#{ENV['HEROKU_APP_ID']}/releases", {}, {
+      releases = make_heroku_request("/apps/#{ENV['HEROKU_APP_ID']}/releases", {}, {
         'Range' => 'version; order=desc;'
       })
 
