@@ -13,7 +13,7 @@ class ServiceIntrospection
       return @deployment_history if @deployment_history
 
       # get list of most recent releases
-      releases = make_heroku_request("/app/#{ENV[HEROKU_APP_ID]}/releases", {}, {
+      releases = make_heroku_request("/app/#{ENV['HEROKU_APP_ID']}/releases", {}, {
         'Range' => 'version; order=desc;'
       })
 
