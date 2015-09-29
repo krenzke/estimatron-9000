@@ -33,18 +33,16 @@ class App < Sinatra::Base
   end
 
   get '/pulse' do
-    # sample = settings.sampler.sample
-    # json(sample)
     if settings.introspector
       json({
         hosting_platform: ServiceIntrospection.hosting_platform,
         deployments: settings.introspector.deployment_history,
-      })
+      }.merge(settings.sampler.sample))
     else
       json({
         hosting_platform: ServiceIntrospection.hosting_platform,
         error: 'no introspector',
-      })
+      }.merge(settings.sampler.sample))
     end
   end
 

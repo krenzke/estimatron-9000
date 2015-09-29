@@ -42,7 +42,7 @@ class MetricsSampler
     }
     if @last_cpu_time
       elapsed = now - @last_cpu_time
-      return if elapsed < 1 # Causing some kind of math underflow
+      return s if elapsed < 1 # Causing some kind of math underflow
 
       usertime = t.utime - @last_utime
       systemtime = t.stime - @last_stime

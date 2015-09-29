@@ -1,36 +1,25 @@
 require 'faraday'
 require 'json'
-require 'logger'
-$logger = ::Logger.new(STDOUT)
 
 class ServiceIntrospection
   class Heroku
     API_URL_BASE = 'https://api.heroku.com'
+    PREV_DEPLOY_COUNT = 5
 
     def self.is_current_platform?
       ENV['DYNO'] || ENV['HEROKU_API_KEY']
     end
 
-    def initialize
-      $logger.info("Created ServiceIntrospection::Heroku")
-      $logger.info("ENV['HEROKU_API_KEY']: #{ENV['HEROKU_API_KEY']}")
-      $logger.info("ENV['HEROKU_APP_ID']: #{ENV['HEROKU_APP_ID']}")
-    end
-
     def deployment_history
       return @deployment_history if @deployment_history
-      $logger.info("Fetching deployments")
 
       # get list of most recent releases
       releases = make_heroku_request("/apps/#{ENV['HEROKU_APP_ID']}/releases", {}, {
         'Range' => 'version; order=desc;'
       })
 
-      $logger.info("releases: #{releases.size}")
-      $logger.info("releases: #{releases}")
-
       # we're only interested in deployments, so select those
-      @deployment_history = releases.select{ |e| e['description'] =~ /^Deploy/ }.map do |r|
+      @deployment_history = releases.select{ |e| e['description'] =~ /^Deploy/ }[0..PREV_DEPLOY_COUNT].map do |r|
         {
           created_at: r['created_at'],
           description: r['description'],
@@ -39,11 +28,9 @@ class ServiceIntrospection
         }
       end
 
-      $logger.info("deployments: #{@deployment_history.size}")
-
       # need to look at the slug to get the full git sha and commit message
       @deployment_history.each do |deploy|
-        slug_info = make_heroku_request("/apps/estimatron-9000/slugs/#{deploy[:slug_id]}")
+        slug_info = make_heroku_request("/apps/#{ENV['HEROKU_APP_ID']}/slugs/#{deploy[:slug_id]}")
         deploy[:git_sha] = slug_info['commit']
         deploy[:git_comment] = slug_info['commit_description']
       end
