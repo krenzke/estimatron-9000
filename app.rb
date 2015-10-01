@@ -24,7 +24,7 @@ class App < Sinatra::Base
   end
 
   configure :development do
-    # SamplingLoop.new.run
+    SamplingLoop.new(settings.sampler, settings.introspector).run
   end
 
   get '/' do
@@ -51,7 +51,7 @@ class App < Sinatra::Base
   def generate_phrase
     numbers = [2,4,8,12,16]
     people = ['Burton', 'Krenzke', 'Scheirman', 'Greg']
-    case rand(6)
+    case rand(7)
     when 0
       "Let's just call it a #{numbers.sample} for now"
     when 1
@@ -64,6 +64,8 @@ class App < Sinatra::Base
       "Give it a #{numbers.sample}, but don't assign the ticket to me"
     when 5
       "Call it a #{numbers.sample}, but assign a #{numbers.sample} to the rest of them"
+    when 6
+      "It's a classic #{numbers.sample}"
     end
   end
 end
